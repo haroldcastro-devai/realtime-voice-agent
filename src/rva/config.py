@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     llm_backend: str = "mock"
     tts_backend: str = "mock"
 
+    # Google Colab (or any GPU VM) running colab/nemo_server.py
+    remote_inference_url: str = ""
+    remote_inference_token: str = ""
+
     openai_base_url: str = "https://api.openai.com/v1"
     openai_api_key: str = ""
     openai_llm_model: str = "gpt-4o-mini"

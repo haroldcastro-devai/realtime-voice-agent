@@ -16,7 +16,30 @@ This repository is **original code** (MIT), written for a public portfolio. It i
 | `CampaignDialer` | In-process job queue (wire ARI originate in your lab) |
 | Dashboard `:8080` | Live STT / LLM / TTS milliseconds |
 
-Default backends are **mocks**, so a laptop can run the demo without GPU or paid APIs. Set `*_BACKEND=openai_compat` to point at an OpenAI-compatible server.
+Default backends are **mocks**, so a laptop can run the demo without GPU or paid APIs.
+
+**Split used for interviews:** GPU work (NVIDIA NeMo STT/TTS) on **Google Colab**; everything else on your PC (dashboard, VAD, AudioSocket, dialer, LLM).
+
+```
+PC (no GPU)                         Colab T4
+AudioSocket + VAD + dashboard  -->  POST /stt  NeMo ASR
+LLM (mock or API)              <--  POST /tts  NeMo FastPitch
+```
+
+1. Open [`notebooks/colab_nemo_gpu.ipynb`](notebooks/colab_nemo_gpu.ipynb) with a T4 runtime.  
+2. Paste the printed URL into `.env`:
+
+```
+STT_BACKEND=remote
+TTS_BACKEND=remote
+LLM_BACKEND=mock
+REMOTE_INFERENCE_URL=https://....ngrok-free.app
+REMOTE_INFERENCE_TOKEN=lab-token-change-me
+```
+
+3. On the PC: `python -m rva.cli serve` — still CPU-only.
+
+Set `*_BACKEND=openai_compat` if you prefer a cloud API instead of Colab.
 
 ## Quick start
 

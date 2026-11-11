@@ -6,6 +6,8 @@ from wave import Wave_write
 
 import httpx
 
+from rva.audio_io import resample_pcm16
+
 
 class OpenAICompatError(RuntimeError):
     pass
@@ -76,23 +78,8 @@ class OpenAICompatTTS:
         response.raise_for_status()
         pcm = response.content
         if sample_rate == 8000:
-            return _downsample_pcm16(pcm, 24000, 8000)
+            return resample_pcm16(pcm, 24000, 8000)
         return pcm
-
-
-def _downsample_pcm16(pcm: bytes, src_rate: int, dst_rate: int) -> bytes:
-    if src_rate == dst_rate or len(pcm) < 4:
-        return pcm
-    step = src_rate / dst_rate
-    n_src = len(pcm) // 2
-    n_dst = int(n_src / step)
-    out = bytearray(n_dst * 2)
-    for i in range(n_dst):
-        src_index = int(i * step)
-        if src_index >= n_src:
-            break
-        out[i * 2 : i * 2 + 2] = pcm[src_index * 2 : src_index * 2 + 2]
-    return bytes(out)
 
 
 def _pcm16_to_wav(pcm: bytes, sample_rate: int) -> bytes:
